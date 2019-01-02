@@ -4,7 +4,8 @@ def func(x):
     return x ** 2 - 10 * np.sin(x)
 
 def func2(x): 
-    return ((x[:, 0] - 5)**2 + (x[:, 1] - 1)**2)
+#    return ((x[:, 0] - 5)**2 + (x[:, 1] - 1)**2)
+    return (x[0] - 5) ** 2 + (x[1] - 1) ** 2
     
 
 def func3(t):
@@ -29,6 +30,7 @@ def func4(x):
 
 
 def bound(v, v_min, v_max):
+    res = np.array([])
     ndim = np.size(v_min)
     Np = np.shape(v)[0]    
     for i in range(Np):
@@ -37,6 +39,18 @@ def bound(v, v_min, v_max):
                 v[i, j] = v_max[j]
             elif v[i, j] < v_min[j]:
                 v[i, j] = v_min[j]
+    return res
+
+
+def feval(data, func):
+    Np = np.shape(data)[0]
+#    ndim = np.shape(data)[1]
+    res = np.zeros([Np, 1])
+    for i in range(Np):
+        x = data[i]
+        res[i][0] = func(x)
+    return res
+
                 
 
 def is_converged(data, index, interval = 100, tolerance = 1e-6):
