@@ -9,37 +9,65 @@ def func2(x):
     
 
 def func3(t):
-    Np = np.shape(t)[0]
 #    ndim = np.shape(t)[1]
-    x = np.linspace(0, 5, 100)
-    y = x ** 2 + x
-    cost = np.zeros([Np, 1])
-    for i in range(len(x)):
-        cost += np.reshape(((t[:, 0] * (x[i]**2) + t[:, 1] * x[i] + t[:, 2] - y[i]) ** 2), (Np, 1))
-    return cost
+    x = np.linspace(0, 5, 10)
+    y = x ** 2 + 2 * x + 1
+    return np.sum( np.abs(t[0] * (x ** 2) + t[1] * x + t[2] - y) )
+
+
+def rosenbrock(x):
+    a = x[0]
+    b = x[1]
+    return 100 * (b - a**2)**2 + (1 - a)**2
+    
     
 
 def func4(x):
 #    Np = np.shape(x)[0]
 #    ndim = np.shape(x)[1]
-    res = -np.cos(x[:, 0]) * np.cos(x[:, 1])
-    t1 = -(x[:, 0] - np.pi)**2
-    t2 = -(x[:, 1] - np.pi)**2
+    res = -np.cos(x[0]) * np.cos(x[1])
+    t1 = -(x[0] - np.pi)**2
+    t2 = -(x[1] - np.pi)**2
     res *= np.exp(t1 + t2)
     return res
 
 
-def bound(v, v_min, v_max):
-    res = np.array([])
-    ndim = np.size(v_min)
-    Np = np.shape(v)[0]    
+def func5(x):
+    a = x[0]
+    b = x[1]
+    res = np.sin(a+b) + (a-b)**2 - 1.5*a + 2.5*b + 1
+    return res
+
+""" keep the x matrix in the bound of x_max and x_min
+    returns those 'particles' and 'dimensions' which were bounded 
+    third element of the returned is either 1 or -1 
+    +1: bounded by max
+    -1: bounded by min """
+def bound(x, x_min, x_max):
+    res = []
+    ndim = np.size(x_min)
+    Np = np.shape(x)[0]    
     for i in range(Np):
         for j in range(ndim):
-            if v[i, j] > v_max[j]:
-                v[i, j] = v_max[j]
-            elif v[i, j] < v_min[j]:
-                v[i, j] = v_min[j]
-    return res
+            if x[i, j] > x_max[j]:
+                x[i, j] = x_max[j]
+                res.append([i, j, 1])
+            elif x[i, j] < x_min[j]:
+                x[i, j] = x_min[j]
+                res.append([i, j, -1])
+    return np.array(res)
+
+
+def velocity_modifier(v, data):
+    n = np.shape(data)[0]
+    for i in range(n):
+        a = data[i][0]
+        b = data[i][1]
+        dir = data[i][2]
+        if dir > 0 and v[a][b] > 0:
+            v[a][b] = 0
+        elif dir < 0 and v[a][b] < 0:
+            v[a][b] = 0
 
 
 def feval(data, func):
